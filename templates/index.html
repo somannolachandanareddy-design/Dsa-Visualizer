@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Complete DSA Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 3em;
+            margin-bottom: 10px;
+            animation: gradient 3s ease infinite;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #f1f3f5;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #495057;
+            border-radius: 10px 10px 0 0;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab:hover:not(.active) {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        select, input, button, textarea {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button.stop-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+        }
+
+        button.generate-btn {
+            background: linear-gradient(135deg, #51cf66, #37b24d);
+        }
+
+        .info-panel {
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-left: 5px solid #2196f3;
+        }
+
+        .info-panel h3 {
+            margin-bottom: 10px;
+            color: #1976d2;
+        }
+
+        .info-panel p {
+            color: #495057;
+            line-height: 1.6;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .visualization {
+            min-height: 400px;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border-radius: 15px;
+            padding: 30px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 5px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .bar {
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            min-width: 30px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            padding-bottom: 8px;
+            font-size: 0.9em;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .bar.comparing { background: linear-gradient(180deg, #ffd700 0%, #ffa500 100%); }
+        .bar.swapped { background: linear-gradient(180deg, #ff6b6b 0%, #ee5a6f 100%); }
+        .bar.sorted { background: linear-gradient(180deg, #51cf66 0%, #37b24d 100%); }
+        .bar.checking { background: linear-gradient(180deg, #74c0fc 0%, #4dabf7 100%); }
+        .bar.found { background: linear-gradient(180deg, #ff6b6b 0%, #ee5a6f 100%); transform: scale(1.1); }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h4 {
+            color: #667eea;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card p {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        canvas {
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .hashmap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border-radius: 15px;
+            min-height: 400px;
+        }
+
+        .hash-bucket {
+            background: white;
+            border: 3px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .hash-bucket.highlight {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, #fffbea, #fff4cc);
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .bucket-index {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .bucket-items {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .bucket-item {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            word-break: break-word;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .bucket-item.collision {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+        }
+
+        .stack-queue-viz {
+            display: flex;
+            gap: 10px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border-radius: 15px;
+            min-height: 400px;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .stack-item, .queue-item {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            animation: slideIn 0.5s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .stack-item.highlight, .queue-item.highlight {
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 968px) {
+            h1 { font-size: 2em; }
+            .tabs { flex-direction: column; }
+            .controls { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Complete DSA Visualizer</h1>
+        <p class="subtitle">Visualize Sorting, Searching, Trees, Graphs, HashMaps, Stacks & Queues</p>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="sorting">🔄 Sorting</button>
+            <button class="tab" data-tab="searching">🔍 Searching</button>
+            <button class="tab" data-tab="tree">🌳 Binary Tree</button>
+            <button class="tab" data-tab="graph">🕸️ Graph</button>
+            <button class="tab" data-tab="hashmap">🗂️ HashMap</button>
+            <button class="tab" data-tab="stack-queue">📚 Stack/Queue</button>
+        </div>
+
+        <!-- SORTING SECTION -->
+        <div class="section active" id="sorting-section">
+            <div class="controls">
+                <div class="control-group">
+                    <label>📊 Algorithm</label>
+                    <select id="sortAlgo">
+                        <option value="bubble">Bubble Sort</option>
+                        <option value="quick">Quick Sort</option>
+                        <option value="merge">Merge Sort</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>📏 Array Size</label>
+                    <input type="number" id="sortSize" min="5" max="50" value="15">
+                </div>
+                <div class="control-group">
+                    <label>⚡ Speed (ms)</label>
+                    <input type="number" id="sortSpeed" min="50" max="2000" value="300">
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button class="generate-btn" id="sortGenBtn">Generate</button>
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button id="sortStartBtn">Start</button>
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button class="stop-btn" id="sortStopBtn" disabled>Stop</button>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #667eea, #764ba2);"></div><span>Normal</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #ffd700, #ffa500);"></div><span>Comparing</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f);"></div><span>Swapping</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #51cf66, #37b24d);"></div><span>Sorted</span></div>
+            </div>
+
+            <div class="info-panel">
+                <h3 id="sortStatus">Ready to Sort</h3>
+                <p id="sortAction">Click "Generate" to create a random array, then "Start" to visualize</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card"><h4>Current Step</h4><p id="sortCurStep">0</p></div>
+                <div class="stat-card"><h4>Total Steps</h4><p id="sortTotStep">0</p></div>
+                <div class="stat-card"><h4>Array Size</h4><p id="sortArrSize">0</p></div>
+            </div>
+
+            <div class="visualization" id="sortViz"></div>
+        </div>
+
+        <!-- SEARCHING SECTION -->
+        <div class="section" id="searching-section">
+            <div class="controls">
+                <div class="control-group">
+                    <label>🔎 Algorithm</label>
+                    <select id="searchAlgo">
+                        <option value="linear">Linear Search</option>
+                        <option value="binary">Binary Search</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>🎯 Target Value</label>
+                    <input type="number" id="searchTarget" value="42">
+                </div>
+                <div class="control-group">
+                    <label>📏 Array Size</label>
+                    <input type="number" id="searchSize" min="5" max="50" value="20">
+                </div>
+                <div class="control-group">
+                    <label>⚡ Speed (ms)</label>
+                    <input type="number" id="searchSpeed" min="100" max="2000" value="500">
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button class="generate-btn" id="searchGenBtn">Generate</button>
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button id="searchStartBtn">Start</button>
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button class="stop-btn" id="searchStopBtn" disabled>Stop</button>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #667eea, #764ba2);"></div><span>Unsearched</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #74c0fc, #4dabf7);"></div><span>Checking</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f);"></div><span>Found</span></div>
+            </div>
+
+            <div class="info-panel">
+                <h3 id="searchStatus">Ready to Search</h3>
+                <p id="searchAction">Generate an array and search for a target value</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card"><h4>Current Step</h4><p id="searchCurStep">0</p></div>
+                <div class="stat-card"><h4>Total Steps</h4><p id="searchTotStep">0</p></div>
+                <div class="stat-card"><h4>Comparisons</h4><p id="searchComps">0</p></div>
+            </div>
+
+            <div class="visualization" id="searchViz"></div>
+        </div>
+
+        <!-- TREE SECTION -->
+        <div class="section" id="tree-section">
+            <div class="controls">
+                <div class="control-group">
+                    <label>🌲 Operation</label>
+                    <select id="treeOp">
+                        <option value="build">Build Tree</option>
+                        <option value="traverse">Inorder Traversal</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>📝 Values (comma-separated)</label>
+                    <input type="text" id="treeVals" value="50,30,70,20,40,60,80" style="grid-column: span 2;">
+                </div>
+                <div class="control-group">
+                    <label>⚡ Speed (ms)</label>
+                    <input type="number" id="treeSpeed" min="200" max="2000" value="800">
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button id="treeStartBtn">Start</button>
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button class="stop-btn" id="treeStopBtn" disabled>Stop</button>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: #667eea;"></div><span>Normal</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #ffd700;"></div><span>Current</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #51cf66;"></div><span>Visited</span></div>
+            </div>
+
+            <div class="info-panel">
+                <h3 id="treeStatus">Binary Search Tree</h3>
+                <p id="treeAction">Enter values to build or traverse a BST</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card"><h4>Current Step</h4><p id="treeCurStep">0</p></div>
+                <div class="stat-card"><h4>Total Steps</h4><p id="treeTotStep">0</p></div>
+            </div>
+
+            <canvas id="treeCanvas"></canvas>
+        </div>
+
+        <!-- GRAPH SECTION -->
+        <div class="section" id="graph-section">
+            <div class="controls">
+                <div class="control-group">
+                    <label>🕸️ Algorithm</label>
+                    <select id="graphAlgo">
+                        <option value="bfs">BFS</option>
+                        <option value="dfs">DFS</option>
+                        <option value="dijkstra">Dijkstra</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>🎯 Start Node</label>
+                    <input type="text" id="graphStart" value="A">
+                </div>
+                <div class="control-group">
+                    <label>📊 Graph (JSON)</label>
+                    <textarea id="graphInput" style="grid-column: span 2;">{"A": {"B": 4, "C": 2}, "B": {"A": 4, "C": 1, "D": 5}, "C": {"A": 2, "B": 1, "D": 8, "E": 10}, "D": {"B": 5, "C": 8, "E": 2}, "E": {"C": 10, "D": 2}}</textarea>
+                </div>
+                <div class="control-group">
+                    <label>⚡ Speed (ms)</label>
+                    <input type="number" id="graphSpeed" min="200" max="2000" value="1000">
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button id="graphStartBtn">Start</button>
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button class="stop-btn" id="graphStopBtn" disabled>Stop</button>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: #868e96;"></div><span>Unvisited</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #ffd700;"></div><span>Current</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #51cf66;"></div><span>Visited</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #74c0fc;"></div><span>Exploring</span></div>
+            </div>
+
+            <div class="info-panel">
+                <h3 id="graphStatus">Graph Algorithms</h3>
+                <p id="graphAction">Configure your graph and select an algorithm</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card"><h4>Current Step</h4><p id="graphCurStep">0</p></div>
+                <div class="stat-card"><h4>Total Steps</h4><p id="graphTotStep">0</p></div>
+                <div class="stat-card"><h4>Visited Nodes</h4><p id="graphVisited">0</p></div>
+            </div>
+
+            <canvas id="graphCanvas"></canvas>
+        </div>
+
+        <!-- HASHMAP SECTION -->
+        <div class="section" id="hashmap-section">
+            <div class="controls">
+                <div class="control-group">
+                    <label>📦 Table Size</label>
+                    <input type="number" id="hmSize" min="5" max="20" value="10">
+                </div>
+                <div class="control-group">
+                    <label>⚙️ Operations (JSON)</label>
+                    <textarea id="hmOps" style="grid-column: span 3;">[{"type":"insert","key":"apple","value":"red"},{"type":"insert","key":"banana","value":"yellow"},{"type":"insert","key":"grape","value":"purple"},{"type":"search","key":"apple"}]</textarea>
+                </div>
+                <div class="control-group">
+                    <label>⚡ Speed (ms)</label>
+                    <input type="number" id="hmSpeed" min="200" max="2000" value="1000">
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button id="hmStartBtn">Start</button>
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button class="stop-btn" id="hmStopBtn" disabled>Stop</button>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: white; border: 2px solid #e9ecef;"></div><span>Empty</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #e3f2fd;"></div><span>Has Item</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #ffcdd2;"></div><span>Collision</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #fffbea; border: 3px solid #ffd700;"></div><span>Active</span></div>
+            </div>
+
+            <div class="info-panel">
+                <h3 id="hmStatus">HashMap with Chaining</h3>
+                <p id="hmAction">Add operations to see hashing and collision handling</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card"><h4>Current Step</h4><p id="hmCurStep">0</p></div>
+                <div class="stat-card"><h4>Total Steps</h4><p id="hmTotStep">0</p></div>
+                <div class="stat-card"><h4>Collisions</h4><p id="hmCollisions">0</p></div>
+            </div>
+
+            <div class="hashmap-grid" id="hmGrid"></div>
+        </div>
+
+        <!-- STACK/QUEUE SECTION -->
+        <div class="section" id="stack-queue-section">
+            <div class="controls">
+                <div class="control-group">
+                    <label>📚 Type</label>
+                    <select id="sqType">
+                        <option value="stack">Stack</option>
+                        <option value="queue">Queue</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>⚙️ Operations (JSON)</label>
+                    <textarea id="sqOps" style="grid-column: span 2;">[{"type":"push","value":10},{"type":"push","value":20},{"type":"push","value":30},{"type":"pop"}]</textarea>
+                </div>
+                <div class="control-group">
+                    <label>⚡ Speed (ms)</label>
+                    <input type="number" id="sqSpeed" min="200" max="2000" value="800">
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button id="sqStartBtn">Start</button>
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button class="stop-btn" id="sqStopBtn" disabled>Stop</button>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #667eea, #764ba2);"></div><span>Normal Item</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #ffd700, #ffa500);"></div><span>Active</span></div>
+            </div>
+
+            <div class="info-panel">
+                <h3 id="sqStatus">Stack & Queue Operations</h3>
+                <p id="sqAction">Visualize LIFO (Stack) or FIFO (Queue) operations</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card"><h4>Current Step</h4><p id="sqCurStep">0</p></div>
+                <div class="stat-card"><h4>Total Steps</h4><p id="sqTotStep">0</p></div>
+                <div class="stat-card"><h4>Size</h4><p id="sqSize">0</p></div>
+            </div>
+
+            <div class="stack-queue-viz" id="sqViz"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        
+        // Tab Switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-section`).classList.add('active');
+            });
+        });
+
+        // Global animation state
+        let currentAnimation = null;
+
+        // SORTING ALGORITHMS
+        let sortArray = [];
+        
+        document.getElementById('sortGenBtn').addEventListener('click', async () => {
+            const size = parseInt(document.getElementById('sortSize').value);
+            const response = await fetch(`${API_URL}/generate-array`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({size, min: 10, max: 100})
+            });
+            const data = await response.json();
+            sortArray = data.array;
+            displayBars(sortArray, 'sortViz');
+            document.getElementById('sortArrSize').textContent = size;
+            document.getElementById('sortAction').textContent = 'Array generated! Click Start to sort';
+        });
+
+        document.getElementById('sortStartBtn').addEventListener('click', async () => {
+            const algo = document.getElementById('sortAlgo').value;
+            const speed = parseInt(document.getElementById('sortSpeed').value);
+            
+            if (sortArray.length === 0) {
+                alert('Generate array first!');
+                return;
+            }
+
+            document.getElementById('sortStartBtn').disabled = true;
+            document.getElementById('sortStopBtn').disabled = false;
+
+            const response = await fetch(`${API_URL}/sort`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({array: sortArray, algorithm: algo})
+            });
+            const data = await response.json();
+            document.getElementById('sortTotStep').textContent = data.total_steps;
+            
+            animateSteps(data.steps, speed, 'sortViz', 'sortCurStep', 'sortAction', 'sortStartBtn', 'sortStopBtn');
+        });
+
+        document.getElementById('sortStopBtn').addEventListener('click', () => stopAnimation('sortStartBtn', 'sortStopBtn'));
+
+        // SEARCHING ALGORITHMS
+        let searchArray = [];
+        
+        document.getElementById('searchGenBtn').addEventListener('click', async () => {
+            const size = parseInt(document.getElementById('searchSize').value);
+            const response = await fetch(`${API_URL}/generate-array`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({size, min: 1, max: 100})
+            });
+            const data = await response.json();
+            searchArray = data.array;
+            displayBars(searchArray, 'searchViz');
+            document.getElementById('searchAction').textContent = 'Array generated! Click Start to search';
+        });
+
+        document.getElementById('searchStartBtn').addEventListener('click', async () => {
+            const algo = document.getElementById('searchAlgo').value;
+            const target = parseInt(document.getElementById('searchTarget').value);
+            const speed = parseInt(document.getElementById('searchSpeed').value);
+            
+            if (searchArray.length === 0) {
+                alert('Generate array first!');
+                return;
+            }
+
+            document.getElementById('searchStartBtn').disabled = true;
+            document.getElementById('searchStopBtn').disabled = false;
+
+            const response = await fetch(`${API_URL}/search`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({array: searchArray, target, algorithm: algo})
+            });
+            const data = await response.json();
+            document.getElementById('searchTotStep').textContent = data.total_steps;
+            document.getElementById('searchComps').textContent = data.total_steps;
+            
+            animateSteps(data.steps, speed, 'searchViz', 'searchCurStep', 'searchAction', 'searchStartBtn', 'searchStopBtn');
+        });
+
+        document.getElementById('searchStopBtn').addEventListener('click', () => stopAnimation('searchStartBtn', 'searchStopBtn'));
+
+        // TREE ALGORITHMS
+        document.getElementById('treeStartBtn').addEventListener('click', async () => {
+            const op = document.getElementById('treeOp').value;
+            const values = document.getElementById('treeVals').value.split(',').map(v => parseInt(v.trim()));
+            const speed = parseInt(document.getElementById('treeSpeed').value);
+
+            document.getElementById('treeStartBtn').disabled = true;
+            document.getElementById('treeStopBtn').disabled = false;
+
+            const endpoint = op === 'build' ? 'tree/build' : 'tree/traverse';
+            const response = await fetch(`${API_URL}/${endpoint}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({values})
+            });
+            const data = await response.json();
+            document.getElementById('treeTotStep').textContent = data.total_steps;
+            
+            animateTree(data.steps, speed);
+        });
+
+        document.getElementById('treeStopBtn').addEventListener('click', () => stopAnimation('treeStartBtn', 'treeStopBtn'));
+
+        function animateTree(steps, speed, index = 0) {
+            if (!currentAnimation || index >= steps.length) {
+                stopAnimation('treeStartBtn', 'treeStopBtn');
+                return;
+            }
+
+            const step = steps[index];
+            drawTree(step.tree, step);
+            document.getElementById('treeAction').textContent = step.action;
+            document.getElementById('treeCurStep').textContent = index + 1;
+
+            currentAnimation = setTimeout(() => animateTree(steps, speed, index + 1), speed);
+        }
+
+        function drawTree(tree, step = {}) {
+            const canvas = document.getElementById('treeCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (!tree) return;
+
+            function draw(node, x, y, offset) {
+                if (!node) return;
+
+                if (node.left) {
+                    ctx.strokeStyle = '#dee2e6';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x - offset, y + 80);
+                    ctx.stroke();
+                    draw(node.left, x - offset, y + 80, offset / 2);
+                }
+
+                if (node.right) {
+                    ctx.strokeStyle = '#dee2e6';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x + offset, y + 80);
+                    ctx.stroke();
+                    draw(node.right, x + offset, y + 80, offset / 2);
+                }
+
+                let color = '#667eea';
+                if (step.highlight && step.highlight.includes(node.value)) color = '#ffd700';
+                if (step.visited && step.visited.includes(node.value)) color = '#51cf66';
+
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(x, y, 28, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 4;
+                ctx.stroke();
+
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 18px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(node.value, x, y);
+            }
+
+            draw(tree, canvas.width / 2, 50, 120);
+        }
+
+        // GRAPH ALGORITHMS
+        document.getElementById('graphStartBtn').addEventListener('click', async () => {
+            const algo = document.getElementById('graphAlgo').value;
+            const start = document.getElementById('graphStart').value;
+            const graphInput = document.getElementById('graphInput').value;
+            const speed = parseInt(document.getElementById('graphSpeed').value);
+
+            try {
+                const graph = JSON.parse(graphInput);
+
+                document.getElementById('graphStartBtn').disabled = true;
+                document.getElementById('graphStopBtn').disabled = false;
+
+                const response = await fetch(`${API_URL}/graph/traverse`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({graph, start, algorithm: algo})
+                });
+                const data = await response.json();
+                document.getElementById('graphTotStep').textContent = data.total_steps;
+                
+                animateGraph(data.steps, speed);
+            } catch (e) {
+                alert('Invalid JSON format!');
+                document.getElementById('graphStartBtn').disabled = false;
+            }
+        });
+
+        document.getElementById('graphStopBtn').addEventListener('click', () => stopAnimation('graphStartBtn', 'graphStopBtn'));
+
+        function animateGraph(steps, speed, index = 0) {
+            if (!currentAnimation || index >= steps.length) {
+                stopAnimation('graphStartBtn', 'graphStopBtn');
+                return;
+            }
+
+            const step = steps[index];
+            drawGraph(step.graph, step);
+            document.getElementById('graphAction').textContent = step.action;
+            document.getElementById('graphCurStep').textContent = index + 1;
+            document.getElementById('graphVisited').textContent = step.visited ? step.visited.length : 0;
+
+            currentAnimation = setTimeout(() => animateGraph(steps, speed, index + 1), speed);
+        }
+
+        function drawGraph(graph, step = {}) {
+            const canvas = document.getElementById('graphCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const nodes = Object.keys(graph);
+            const positions = {};
+            const radius = Math.min(canvas.width, canvas.height) * 0.35;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            nodes.forEach((node, i) => {
+                const angle = (2 * Math.PI * i) / nodes.length - Math.PI / 2;
+                positions[node] = {
+                    x: centerX + radius * Math.cos(angle),
+                    y: centerY + radius * Math.sin(angle)
+                };
+            });
+
+            // Draw edges
+            nodes.forEach(node => {
+                Object.keys(graph[node]).forEach(neighbor => {
+                    const start = positions[node];
+                    const end = positions[neighbor];
+
+                    ctx.strokeStyle = '#dee2e6';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(start.x, start.y);
+                    ctx.lineTo(end.x, end.y);
+                    ctx.stroke();
+
+                    const midX = (start.x + end.x) / 2;
+                    const midY = (start.y + end.y) / 2;
+                    ctx.fillStyle = '#495057';
+                    ctx.font = '14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(graph[node][neighbor], midX, midY - 5);
+                });
+            });
+
+            // Draw nodes
+            nodes.forEach(node => {
+                const pos = positions[node];
+                let color = '#868e96';
+
+                if (step.current === node) color = '#ffd700';
+                else if (step.visited && step.visited.includes(node)) color = '#51cf66';
+                else if (step.discovering === node || step.exploring === node) color = '#74c0fc';
+
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 35, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 4;
+                ctx.stroke();
+
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 20px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(node, pos.x, pos.y);
+
+                if (step.distances && step.distances[node] !== Infinity) {
+                    ctx.fillStyle = '#495057';
+                    ctx.font = '12px Arial';
+                    ctx.fillText(`d: ${step.distances[node]}`, pos.x, pos.y + 50);
+                }
+            });
+        }
+
+        // HASHMAP
+        document.getElementById('hmStartBtn').addEventListener('click', async () => {
+            const size = parseInt(document.getElementById('hmSize').value);
+            const opsInput = document.getElementById('hmOps').value;
+            const speed = parseInt(document.getElementById('hmSpeed').value);
+
+            try {
+                const operations = JSON.parse(opsInput);
+
+                document.getElementById('hmStartBtn').disabled = true;
+                document.getElementById('hmStopBtn').disabled = false;
+
+                const response = await fetch(`${API_URL}/hashmap`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({operations, size})
+                });
+                const data = await response.json();
+                document.getElementById('hmTotStep').textContent = data.total_steps;
+                
+                animateHashmap(data.steps, speed, size);
+            } catch (e) {
+                alert('Invalid JSON format!');
+                document.getElementById('hmStartBtn').disabled = false;
+            }
+        });
+
+        document.getElementById('hmStopBtn').addEventListener('click', () => stopAnimation('hmStartBtn', 'hmStopBtn'));
+
+        function animateHashmap(steps, speed, size, index = 0) {
+            if (!currentAnimation || index >= steps.length) {
+                stopAnimation('hmStartBtn', 'hmStopBtn');
+                return;
+            }
+
+            const step = steps[index];
+            displayHashmap(step.hashmap, step.highlight, size);
+            document.getElementById('hmAction').textContent = step.action;
+            document.getElementById('hmCurStep').textContent = index + 1;
+
+            let collisions = 0;
+            Object.values(step.hashmap).forEach(bucket => {
+                if (bucket.length > 1) collisions += bucket.length - 1;
+            });
+            document.getElementById('hmCollisions').textContent = collisions;
+
+            currentAnimation = setTimeout(() => animateHashmap(steps, speed, size, index + 1), speed);
+        }
+
+        function displayHashmap(hashmap, highlight, size) {
+            const grid = document.getElementById('hmGrid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < size; i++) {
+                const bucket = document.createElement('div');
+                bucket.className = 'hash-bucket';
+                if (highlight && highlight.includes(i)) bucket.classList.add('highlight');
+
+                const index = document.createElement('div');
+                index.className = 'bucket-index';
+                index.textContent = `[${i}]`;
+                bucket.appendChild(index);
+
+                const items = document.createElement('div');
+                items.className = 'bucket-items';
+
+                if (hashmap[i]) {
+                    hashmap[i].forEach((item, idx) => {
+                        const itemEl = document.createElement('div');
+                        itemEl.className = 'bucket-item';
+                        if (idx > 0) itemEl.classList.add('collision');
+                        itemEl.textContent = `${item[0]}: ${item[1]}`;
+                        items.appendChild(itemEl);
+                    });
+                }
+
+                bucket.appendChild(items);
+                grid.appendChild(bucket);
+            }
+        }
+
+        // STACK/QUEUE
+        document.getElementById('sqStartBtn').addEventListener('click', async () => {
+            const type = document.getElementById('sqType').value;
+            const opsInput = document.getElementById('sqOps').value;
+            const speed = parseInt(document.getElementById('sqSpeed').value);
+
+            try {
+                const operations = JSON.parse(opsInput);
+
+                document.getElementById('sqStartBtn').disabled = true;
+                document.getElementById('sqStopBtn').disabled = false;
+
+                const response = await fetch(`${API_URL}/stack-queue`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({operations, type})
+                });
+                const data = await response.json();
+                document.getElementById('sqTotStep').textContent = data.total_steps;
+                
+                animateStackQueue(data.steps, speed, type);
+            } catch (e) {
+                alert('Invalid JSON format!');
+                document.getElementById('sqStartBtn').disabled = false;
+            }
+        });
+
+        document.getElementById('sqStopBtn').addEventListener('click', () => stopAnimation('sqStartBtn', 'sqStopBtn'));
+
+        function animateStackQueue(steps, speed, type, index = 0) {
+            if (!currentAnimation || index >= steps.length) {
+                stopAnimation('sqStartBtn', 'sqStopBtn');
+                return;
+            }
+
+            const step = steps[index];
+            displayStackQueue(type === 'stack' ? step.stack : step.queue, step.highlight, type);
+            document.getElementById('sqAction').textContent = step.action;
+            document.getElementById('sqCurStep').textContent = index + 1;
+            document.getElementById('sqSize').textContent = (type === 'stack' ? step.stack : step.queue).length;
+
+            currentAnimation = setTimeout(() => animateStackQueue(steps, speed, type, index + 1), speed);
+        }
+
+        function displayStackQueue(items, highlight, type) {
+            const viz = document.getElementById('sqViz');
+            viz.innerHTML = '';
+            viz.style.flexDirection = type === 'stack' ? 'column-reverse' : 'row';
+            viz.style.alignItems = type === 'stack' ? 'center' : 'flex-end';
+
+            items.forEach((item, idx) => {
+                const el = document.createElement('div');
+                el.className = type === 'stack' ? 'stack-item' : 'queue-item';
+                el.textContent = item;
+                if (highlight && highlight.includes(idx)) el.classList.add('highlight');
+                viz.appendChild(el);
+            });
+        }
+
+        // UTILITY FUNCTIONS
+        function displayBars(array, containerId, highlights = {}) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            const maxValue = Math.max(...array);
+            const barWidth = Math.min(60, (container.clientWidth - (array.length * 5)) / array.length);
+
+            array.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${(value / maxValue) * 350}px`;
+                bar.style.width = `${barWidth}px`;
+                bar.textContent = value;
+
+                if (highlights.comparing && highlights.comparing.includes(index)) bar.classList.add('comparing');
+                if (highlights.swapped && highlights.swapped.includes(index)) bar.classList.add('swapped');
+                if (highlights.sorted && highlights.sorted.includes(index)) bar.classList.add('sorted');
+                if (highlights.checking && highlights.checking.includes(index)) bar.classList.add('checking');
+                if (highlights.found && highlights.found.includes(index)) bar.classList.add('found');
+
+                container.appendChild(bar);
+            });
+        }
+
+        function animateSteps(steps, speed, vizId, stepId, actionId, startBtn, stopBtn, index = 0) {
+            if (!currentAnimation || index >= steps.length) {
+                stopAnimation(startBtn, stopBtn);
+                return;
+            }
+
+            const step = steps[index];
+            displayBars(step.array, vizId, step);
+            document.getElementById(actionId).textContent = step.action;
+            document.getElementById(stepId).textContent = index + 1;
+
+            currentAnimation = setTimeout(() => animateSteps(steps, speed, vizId, stepId, actionId, startBtn, stopBtn, index + 1), speed);
+        }
+
+        function stopAnimation(startBtn, stopBtn) {
+            if (currentAnimation) {
+                clearTimeout(currentAnimation);
+                currentAnimation = null;
+            }
+            document.getElementById(startBtn).disabled = false;
+            document.getElementById(stopBtn).disabled = true;
+        }
+
+        // Initialize first visualization
+        document.getElementById('sortGenBtn').click();
+    </script>
+</body>
+</html>
