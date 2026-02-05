@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 import random
-from collections import deque
+from collections import deque 
 import heapq
 
 app = Flask(__name__)
