@@ -21,6 +21,8 @@ A Python-based tool to visualize sorting algorithms using graphical representati
 
 
  Output
+<img width="1284" height="616" alt="image" src="https://github.com/user-attachments/assets/e478f9da-c718-4fab-9aa8-afe8480104a4" />
+
 
 
 
